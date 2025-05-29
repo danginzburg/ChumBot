@@ -1,2 +1,2 @@
 # ChumBot
--[] Has Valorant role randomization feature for 5 stacks.
+- Has Valorant role randomization feature for 5 stacks.
