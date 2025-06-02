@@ -138,6 +138,9 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 async def on_ready():
     await bot.tree.sync()
     print(f"✅ Logged in as {bot.user}")
+    print("Registered prefix commands:")
+    for command in bot.commands:
+        print(f"- {command.name}: {command.callback.__module__}.{command.callback.__name__}")
 
 bot.add_cog(RoleAssigner(bot))
 bot.run("MTM3NjY0NTkxNDE0MzM1OTE0Ng.Ga07Iz.kkVr2Jbl72KQ-1pIi4dHenmFNXFuPmTVnX7TUM")
