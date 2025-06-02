@@ -56,6 +56,10 @@ class RoleAssigner(commands.Cog):
     # !chum command
     @commands.command()
     async def chum(self, ctx, member: discord.Member = None):
+        print(f"[DEBUG] ctx: {ctx}")
+        print(f"[DEBUG] ctx type: {type(ctx)}")
+        print(f"[DEBUG] member: {member}")
+        print(f"[DEBUG] member type: {type(member)}")
         member = member or ctx.author
         points = get_user_points(member.id)
         msg = f"**{member.display_name}'s Chum Points:**\n"
