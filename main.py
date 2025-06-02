@@ -6,8 +6,9 @@ from discord import app_commands
 ROLES = ["Flex", "Controller", "Sentinel", "Duelist", "Initiator"]
 DEFAULT_ELO = 1000
 chum_points = {}
-match_assignments = {}  # Stores active match role assignments per channel
+match_assignments = {}  # Stores role assignments per channel
 
+# ELO system functions
 def get_user_points(user_id):
     if user_id not in chum_points:
         chum_points[user_id] = {role: DEFAULT_ELO for role in ROLES}
@@ -19,11 +20,13 @@ def calculate_elo(winner_elo, loser_elo, k=32):
     new_loser_elo = loser_elo + k * (0 - (1 - expected_win))
     return round(new_winner_elo), round(new_loser_elo)
 
+# Cog containing all commands
 class RoleAssigner(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.bot.tree.add_command(self.randomroles)
 
+    # Slash command to assign random roles
     @app_commands.command(name="randomroles", description="Assign random Valorant roles to 5 users.")
     @app_commands.describe(
         user1="First user", user2="Second user", user3="Third user",
@@ -35,11 +38,9 @@ class RoleAssigner(commands.Cog):
                           user3: discord.Member,
                           user4: discord.Member,
                           user5: discord.Member):
-
         users = [user1, user2, user3, user4, user5]
         assigned_roles = random.sample(ROLES, len(users))
 
-        # Store roles for later ELO update
         match_assignments[interaction.channel_id] = list(zip(users, assigned_roles))
 
         response = "**🎲 Random Role Assignment:**\n"
@@ -47,6 +48,7 @@ class RoleAssigner(commands.Cog):
             response += f"- {user.mention} → **{role}**\n"
         await interaction.response.send_message(response)
 
+    # !chum command
     @commands.command()
     async def chum(self, ctx, member: discord.Member = None):
         member = member or ctx.author
@@ -56,6 +58,7 @@ class RoleAssigner(commands.Cog):
             msg += f"{role}: {elo}\n"
         await ctx.send(msg)
 
+    # !update_chum (admin only)
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def update_chum(self, ctx, member: discord.Member, role: str, delta: int):
@@ -67,6 +70,7 @@ class RoleAssigner(commands.Cog):
         points[role] += delta
         await ctx.send(f"{member.display_name}'s {role} chum points updated to {points[role]}.")
 
+    # !chum_leaderboard
     @commands.command()
     async def chum_leaderboard(self, ctx, role: str):
         role = role.capitalize()
@@ -82,18 +86,19 @@ class RoleAssigner(commands.Cog):
             msg += f"{i}. {member.display_name}: {elo}\n"
         await ctx.send(msg)
 
+    # !reset_leaderboard
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def reset_leaderboard(self, ctx):
         chum_points.clear()
         await ctx.send("Chum points leaderboard has been reset.")
 
+    # !neatqueue_result
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def neatqueue_result(self, ctx,
                                winners: commands.Greedy[discord.Member],
                                losers: commands.Greedy[discord.Member]):
-        """Use role assignments from /randomroles if available"""
         if ctx.channel.id not in match_assignments:
             await ctx.send("No prior /randomroles found for this channel.")
             return
@@ -115,7 +120,7 @@ class RoleAssigner(commands.Cog):
 
         await ctx.send("Chum points updated based on last assigned roles.")
 
-# Bot setup
+# === Bot Setup ===
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
@@ -123,7 +128,7 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 @bot.event
 async def on_ready():
     await bot.tree.sync()
-    print(f"Logged in as {bot.user}")
+    print(f"✅ Logged in as {bot.user}")
 
 bot.add_cog(RoleAssigner(bot))
 bot.run("MTM3NjY0NTkxNDE0MzM1OTE0Ng.Ga07Iz.kkVr2Jbl72KQ-1pIi4dHenmFNXFuPmTVnX7TUM")
