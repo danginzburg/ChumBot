@@ -24,9 +24,6 @@ def calculate_elo(winner_elo, loser_elo, k=32):
 class RoleAssigner(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        print("✅ RoleAssigner cog initialized")
-        self.bot.tree.add_command(self.randomroles)
-
 
     # Slash command to assign random roles
     @app_commands.command(name="randomroles", description="Assign random Valorant roles to 5 users.")
