@@ -25,11 +25,6 @@ class RoleAssigner(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.bot.tree.add_command(self.randomroles)
-        self.bot.add_command(self.chum)
-        self.bot.add_command(self.update_chum)
-        self.bot.add_command(self.chum_leaderboard)
-        self.bot.add_command(self.reset_leaderboard)
-        self.bot.add_command(self.neatqueue_result)
 
     # Slash command to assign random roles
     @app_commands.command(name="randomroles", description="Assign random Valorant roles to 5 users.")
